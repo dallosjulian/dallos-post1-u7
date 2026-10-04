@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tareas - Spring Boot & Thymeleaf</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --info: #06b6d4;
+            --info-bg: #ecfeff;
+            --dark: #0f172a;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            border: 1px solid var(--slate-200);
+        }
+
+        .header-card h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-card p {
+            color: var(--slate-500);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.925rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.35);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-secondary {
+            background-color: var(--slate-100);
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--slate-200);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.825rem;
+            border-radius: 6px;
+        }
+
+        .filter-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            border: 1px solid var(--slate-200);
+        }
+
+        .filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--slate-700);
+        }
+
+        .filter-select {
+            padding: 0.55rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--slate-200);
+            background-color: var(--slate-50);
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--dark);
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .table-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--slate-200);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: var(--slate-50);
+            border-bottom: 2px solid var(--slate-200);
+        }
+
+        th {
+            padding: 1rem 1.25rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--slate-500);
+        }
+
+        td {
+            padding: 1.15rem 1.25rem;
+            font-size: 0.925rem;
+            border-bottom: 1px solid var(--slate-200);
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        /* Clase requerida para tareas completadas */
+        .completada {
+            text-decoration: line-through;
+            color: var(--slate-500);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.775rem;
+            font-weight: 600;
+        }
+
+        .badge-alta {
+            background-color: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge-media {
+            background-color: var(--warning-bg);
+            color: #b45309;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-baja {
+            background-color: var(--info-bg);
+            color: #0e7490;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .badge-completada {
+            background-color: var(--success-bg);
+            color: #047857;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-pendiente {
+            background-color: var(--warning-bg);
+            color: #b45309;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .actions-cell form {
+            display: inline-block;
+            margin: 0;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--slate-500);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            color: var(--slate-500);
+        }
+
+        .footer-info {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--slate-500);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header Card -->
+    <header class="header-card">
+        <div>
+            <h1>📋 Sistema de Gestión de Tareas</h1>
+            <p>Unidad 7: Spring Boot 3.2, Thymeleaf & REST API — Estudiante: Dallos</p>
+        </div>
+        <div>
+            <a id="btn-nueva-tarea" th:href="@{/tareas/nueva}" class="btn btn-primary">
+                ➕ Nueva Tarea
+            </a>
+        </div>
+    </header>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <form id="filtro-form" th:action="@{/tareas}" method="get" class="filter-form">
+            <div class="filter-group">
+                <label for="select-prioridad">Prioridad:</label>
+                <select id="select-prioridad" name="prioridad" class="filter-select" onchange="this.form.submit()">
+                    <option value="" th:selected="${prioridadSeleccionada == null}">Todas las prioridades</option>
+                    <option th:each="p : ${prioridades}"
+                            th:value="${p}"
+                            th:text="${p.etiqueta}"
+                            th:selected="${prioridadSeleccionada == p}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="select-completada">Estado:</label>
+                <select id="select-completada" name="completada" class="filter-select" onchange="this.form.submit()">
+                    <option value="" th:selected="${completadaSeleccionada == null}">Todos los estados</option>
+                    <option value="false" th:selected="${completadaSeleccionada != null and !completadaSeleccionada}">Pendientes</option>
+                    <option value="true" th:selected="${completadaSeleccionada != null and completadaSeleccionada}">Completadas</option>
+                </select>
+            </div>
+
+            <div th:if="${prioridadSeleccionada != null or completadaSeleccionada != null}">
+                <a th:href="@{/tareas}" class="btn btn-secondary btn-sm">Limpiar Filtros</a>
+            </div>
+        </form>
+    </section>
+
+    <!-- Table Section -->
+    <main class="table-card">
+        <table>
+            <thead>
+            <tr>
+                <th style="width: 60px;">ID</th>
+                <th>Título y Descripción</th>
+                <th style="width: 120px;">Prioridad</th>
+                <th style="width: 140px;">Fecha Límite</th>
+                <th style="width: 130px;">Estado</th>
+                <th style="width: 240px;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Listado de tareas -->
+            <tr th:each="t : ${tareas}">
+                <td th:text="${t.id}" style="font-weight: 600; color: var(--slate-500);">1</td>
+                <td>
+                    <div th:classappend="${t.completada} ? 'completada' : ''" style="font-weight: 600; font-size: 0.975rem;">
+                        <span th:text="${t.titulo}">Título de la Tarea</span>
+                    </div>
+                    <div th:if="${t.descripcion != null and !t.descripcion.isEmpty()}"
+                         th:classappend="${t.completada} ? 'completada' : ''"
+                         th:text="${t.descripcion}"
+                         style="color: var(--slate-500); font-size: 0.85rem; margin-top: 0.25rem;">
+                        Descripción de la tarea...
+                    </div>
+                </td>
+                <td>
+                    <span th:if="${t.prioridad.name() == 'ALTA'}" class="badge badge-alta" th:text="${t.prioridad.etiqueta}">Alta</span>
+                    <span th:if="${t.prioridad.name() == 'MEDIA'}" class="badge badge-media" th:text="${t.prioridad.etiqueta}">Media</span>
+                    <span th:if="${t.prioridad.name() == 'BAJA'}" class="badge badge-baja" th:text="${t.prioridad.etiqueta}">Baja</span>
+                </td>
+                <td th:text="${#temporals.format(t.fechaLimite, 'dd/MM/yyyy')}" style="color: var(--slate-700); font-weight: 500;">
+                    15/10/2026
+                </td>
+                <td>
+                    <span th:if="${t.completada}" class="badge badge-completada">✓ Completada</span>
+                    <span th:unless="${t.completada}" class="badge badge-pendiente">⏳ Pendiente</span>
+                </td>
+                <td>
+                    <div class="actions-cell">
+                        <!-- Botón Editar -->
+                        <a th:href="@{/tareas/{id}/editar(id=${t.id})}" class="btn btn-secondary btn-sm" title="Editar tarea">
+                            ✏️ Editar
+                        </a>
+
+                        <!-- Formulario POST para Completar -->
+                        <form th:if="${!t.completada}" th:action="@{/tareas/{id}/completar(id=${t.id})}" method="post">
+                            <button type="submit" class="btn btn-success btn-sm" title="Marcar como completada">
+                                ✓ Completar
+                            </button>
+                        </form>
+
+                        <!-- Formulario POST para Eliminar con confirmación -->
+                        <form th:action="@{/tareas/{id}/eliminar(id=${t.id})}" method="post"
+                              onsubmit="return confirm('¿Está seguro de eliminar esta tarea? Esta acción no se puede deshacer.');">
+                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar tarea">
+                                🗑️ Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Fila informativa si la lista está vacía -->
+            <tr th:if="${#lists.isEmpty(tareas)}">
+                <td colspan="6" class="empty-state">
+                    <p style="font-size: 1.1rem; font-weight: 600; color: var(--slate-700);">No se encontraron tareas</p>
+                    <p style="font-size: 0.9rem; margin-top: 0.25rem;">No hay tareas registradas con los filtros seleccionados.</p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <footer class="footer-info">
+        <p>Universidad — Unidad 7: Vista Thymeleaf y API REST sobre el mismo servicio</p>
+    </footer>
+</div>
+</body>
+</html>
